@@ -85,7 +85,7 @@
                 <?php $delay=1; foreach ($data_galeri as $galeri): ?>
                     <article class="tk-program tk-program--merah tk-muncul tk-tunda-<?= $delay ?>">
                         <div style="height:200px; margin:-32px -32px 24px; overflow:hidden; border-radius:32px 32px 0 0">
-                            <img src="<?= base_url(); ?>assets/templates/media/galeri/<?= !empty($galeri['foto']) ? htmlspecialchars($galeri['foto']) : '150-2.jpg'; ?>" style="width:100%; height:100%; object-fit:cover" alt="<?= htmlspecialchars($galeri['judul_foto']); ?>">
+                            <img src="<?= base_url(); ?><?= !empty($galeri['foto']) ? 'uploads/galeri/' . htmlspecialchars($galeri['foto']) : 'assets/templates/media/logos/sd.png'; ?>" style="width:100%; height:100%; object-fit:cover" alt="<?= htmlspecialchars($galeri['judul_foto']); ?>">
                         </div>
                         <h3 style="font-size:1.2rem; line-height:1.3; margin-bottom:0"><?= htmlspecialchars($galeri['judul_foto']); ?></h3>
                     </article>
@@ -120,7 +120,7 @@
             <?php $delay=1; foreach ($data_berita as $berita): ?>
             <article class="tk-kartu tk-muncul tk-tunda-<?= $delay ?>" style="display: flex; gap: 16px; align-items: center; padding: 16px;">
                 <div style="width: 120px; height: 120px; flex-shrink: 0; border-radius: 16px; overflow: hidden;">
-                    <img src="<?= base_url(); ?>assets/templates/media/news/<?= !empty($berita['gambar']) ? htmlspecialchars($berita['gambar']) : '150-2.jpg'; ?>" style="width: 100%; height: 100%; object-fit: cover;" alt="">
+                    <img src="<?= base_url(); ?><?= !empty($berita['gambar']) ? 'uploads/berita/' . htmlspecialchars($berita['gambar']) : 'assets/templates/media/logos/sd.png'; ?>" style="width: 100%; height: 100%; object-fit: cover;" alt="">
                 </div>
                 <div>
                     <small style="color:var(--merah); font-weight:700; display:block; margin-bottom:4px"><?= date('d M Y', strtotime($berita['tanggal_post'])); ?></small>

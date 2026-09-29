@@ -88,14 +88,16 @@ class Sitemap extends CI_Controller
                 'changefreq' => 'monthly',
                 'priority' => '0.7'
             ],
+            // PERBAIKAN: dulu tk/fasilitas & tk/kegiatan (galat 500). Diganti
+            // dengan halaman TK yang benar-benar ada di menu.
             [
-                'loc' => $base . 'tk/fasilitas',
+                'loc' => $base . 'tk/program',
                 'lastmod' => date('Y-m-d'),
                 'changefreq' => 'monthly',
                 'priority' => '0.7'
             ],
             [
-                'loc' => $base . 'tk/kegiatan',
+                'loc' => $base . 'tk/galeri',
                 'lastmod' => date('Y-m-d'),
                 'changefreq' => 'weekly',
                 'priority' => '0.7'

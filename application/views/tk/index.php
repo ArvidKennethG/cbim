@@ -36,7 +36,7 @@
             Pendaftaran murid baru sudah dibuka.
         </p>
         <div class="tk-hero__aksi">
-            <a href="pendaftaran.php" class="tk-tombol tk-tombol--utama">Daftar sekarang</a>
+            <a href="<?= base_url('tk/ppdb'); ?>#formulir" class="tk-tombol tk-tombol--utama">Daftar sekarang</a>
             <a href="#satu-hari" class="tk-tombol tk-tombol--kedua">Lihat kegiatan sehari</a>
         </div>
     </div>
@@ -133,7 +133,7 @@
                 Ayah dan Bunda boleh datang saat jam sekolah, melihat kelas, dan bertanya apa saja
                 ke guru. Tidak perlu janji lewat surat, cukup kabari kami sehari sebelumnya.
             </p>
-            <a href="pendaftaran.php" class="tk-tombol tk-tombol--utama">Atur kunjungan</a>
+            <a href="<?= base_url('kontak'); ?>" class="tk-tombol tk-tombol--utama">Atur kunjungan</a>
         </div>
     </div>
 </section>
@@ -313,7 +313,7 @@
         <div class="tk-ajakan tk-zoom">
             <h2>Pendaftaran murid baru sudah dibuka</h2>
             <p>Isi formulir dalam beberapa menit, atau hubungi kami dulu kalau masih ada yang ingin ditanyakan.</p>
-            <a href="pendaftaran.php" class="tk-tombol tk-tombol--utama">Daftar sekarang</a>
+            <a href="<?= base_url('tk/ppdb'); ?>#formulir" class="tk-tombol tk-tombol--utama">Daftar sekarang</a>
         </div>
     </div>
 </section>

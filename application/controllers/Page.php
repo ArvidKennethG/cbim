@@ -129,8 +129,25 @@ class Page extends CI_Controller
         $this->load->view('templates/pages/footer', $data);
     }
 
-    public function berita()
+    /**
+     * PERBAIKAN: sebelumnya berita() tidak menerima parameter sama sekali, jadi
+     * tautan berita/{id}/{slug} (daftar berita & beranda) berakhir 404 dan
+     * tautan page/berita/{hex} (pencarian & sitemap) hanya menampilkan daftar.
+     * Kini kedua format membuka halaman detail pages/baca.php, sama seperti
+     * Tk::berita() dan Sd::berita().
+     */
+    public function berita($id = null, $slug = null)
     {
+        $id_berita = $this->_id_berita($id);
+        if ($id_berita !== null) {
+            $this->_baca_berita($id_berita);
+            return;
+        }
+        if ($id !== null) {
+            $this->tidak_ditemukan();
+            return;
+        }
+
         $data = $this->_get_common_data('berita', 'Berita - Yayasan CBIM', 'Berita dan informasi terbaru');
 
         $kat_aktif = $this->input->get('kategori') ?? '';
@@ -228,9 +245,96 @@ class Page extends CI_Controller
         $this->load->view('templates/pages/footer', $data);
     }
     
+    /**
+     * Terima ID berita angka (berita/15/judul) atau hex-base64 dari Search.php &
+     * Sitemap.php (page/berita/4d54553d -> "MTU=" -> 15). Selain itu null.
+     */
+    private function _id_berita($id)
+    {
+        if ($id === null || $id === '') {
+            return null;
+        }
+        if (ctype_digit((string) $id)) {
+            return (int) $id;
+        }
+        if (ctype_xdigit((string) $id) && strlen($id) % 2 === 0) {
+            $dekode = base64_decode((string) hex2bin($id), TRUE);
+            if ($dekode !== FALSE && ctype_digit($dekode)) {
+                return (int) $dekode;
+            }
+        }
+        return null;
+    }
+
+    private function _baca_berita($id_berita)
+    {
+        $row = $this->db->get_where('berita', ['id_berita' => $id_berita])->row_array();
+        if (empty($row)) {
+            $this->tidak_ditemukan();
+            return;
+        }
+
+        $mapped = $this->_map_berita([$row]);
+        $berita = $mapped[0];
+
+        $lain = $this->db->where('id_berita !=', $id_berita)
+            ->order_by('tanggal_post', 'DESC')
+            ->limit(3)
+            ->get('berita')->result_array();
+
+        $data = $this->_get_common_data(
+            'berita',
+            $berita['judul'] . ' - Yayasan CBIM',
+            potong($berita['isi'], 155)
+        );
+        $data['berita'] = $berita;
+        $data['lain'] = $this->_map_berita($lain);
+
+        $this->load->view('templates/pages/header', $data);
+        $this->load->view('pages/baca', $data);
+        $this->load->view('templates/pages/footer', $data);
+    }
+
+    /**
+     * PERBAIKAN: tautan "Pendaftaran" di footer mengarah ke /daftar, dan view
+     * pages/daftar.php (pengarah ke formulir PPDB tiap unit) sudah ada, tapi
+     * rute & method-nya belum dibuat sehingga dulu 404.
+     */
+    public function daftar()
+    {
+        $data = $this->_get_common_data('daftar', 'Pendaftaran Siswa Baru - Yayasan CBIM', 'Pilih jenjang dan buka formulir pendaftaran unit pendidikan Yayasan CBIM.');
+        // Daftar unit sama dengan di index() dan jejaring().
+        $data['pendidikan'] = [
+            ['internal' => true, 'slug_unit' => 'tk', 'jenjang' => 'TK', 'nama' => 'TK K Citra Bangsa', 'deskripsi' => 'Pendidikan anak usia dini.', 'tautan' => ''],
+            ['internal' => true, 'slug_unit' => 'sd', 'jenjang' => 'SD', 'nama' => 'SD K Citra Bangsa', 'deskripsi' => 'Pendidikan dasar.', 'tautan' => ''],
+            ['internal' => false, 'slug_unit' => 'smp', 'jenjang' => 'SMP', 'nama' => 'SMP K Citra Bangsa', 'deskripsi' => 'Pendidikan menengah pertama.', 'tautan' => 'http://smpkcitrabangsa.com/'],
+            ['internal' => false, 'slug_unit' => 'sma', 'jenjang' => 'SMA', 'nama' => 'SMA K Citra Bangsa', 'deskripsi' => 'Pendidikan menengah atas.', 'tautan' => 'https://smakcitrabangsa.sch.id/'],
+            ['internal' => false, 'slug_unit' => 'ucb', 'jenjang' => 'Universitas', 'nama' => 'Universitas Citra Bangsa', 'deskripsi' => 'Pendidikan tinggi unggul.', 'tautan' => 'https://ucb.ac.id/']
+        ];
+        $this->load->view('templates/pages/header', $data);
+        $this->load->view('pages/daftar', $data);
+        $this->load->view('templates/pages/footer', $data);
+    }
+
+    /**
+     * Halaman 404 bergaya situs (dipasang lewat $route['404_override']).
+     */
+    public function tidak_ditemukan()
+    {
+        $this->output->set_status_header(404);
+        $data = $this->_get_common_data('404', 'Halaman tidak ditemukan - Yayasan CBIM', 'Halaman yang Anda cari tidak ditemukan.');
+        $this->load->view('templates/pages/header', $data);
+        $this->load->view('pages/empat_nol_empat', $data);
+        $this->load->view('templates/pages/footer', $data);
+    }
+
+    /**
+     * PERBAIKAN: dulu memuat view pages/login.php yang tidak ada -> galat 500.
+     * Login admin ada di /auth.
+     */
     public function login()
     {
-        $this->load->view('pages/login');
+        redirect('auth');
     }
 
     public function kebijakan_privasi()

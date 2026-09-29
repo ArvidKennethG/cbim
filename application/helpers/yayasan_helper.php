@@ -65,9 +65,95 @@ if (!function_exists('ikon')) {
 }
 
 if (!function_exists('bersihkan_html')) {
+    /**
+     * Membersihkan HTML isi berita/konten yang ditulis admin sebelum ditampilkan.
+     *
+     * PERBAIKAN: sebelumnya fungsi ini hanya "return $html;" padahal view
+     * (pages/baca.php) mengandalkannya untuk membuang skrip. Sekarang benar-benar:
+     *  - membuang elemen script, style, iframe, object, embed, form beserta isinya
+     *  - membuang semua atribut event (onclick, onerror, onload, ...)
+     *  - membuang href/src/action yang berskema javascript:, vbscript:, atau data:
+     *    (kecuali data:image/* pada src, yang aman untuk gambar tempel)
+     * Format biasa hasil CKEditor (p, strong, a, img, ul, table, ...) tetap utuh.
+     */
     function bersihkan_html($html)
     {
-        return $html;
+        $html = (string) $html;
+        if (trim($html) === '') {
+            return '';
+        }
+
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $lama = libxml_use_internal_errors(TRUE);
+        $dom->loadHTML('<?xml encoding="UTF-8"><div id="cbim-akar">' . $html . '</div>',
+            LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        libxml_clear_errors();
+        libxml_use_internal_errors($lama);
+
+        $xpath = new DOMXPath($dom);
+
+        foreach ($xpath->query('//script|//style|//iframe|//object|//embed|//form') as $el) {
+            $el->parentNode->removeChild($el);
+        }
+
+        foreach ($xpath->query('//@*') as $attr) {
+            $nama  = strtolower($attr->nodeName);
+            $nilai = strtolower(preg_replace('/[\s\x00-\x1f]+/', '', $attr->nodeValue));
+            $buang = strpos($nama, 'on') === 0;
+            if (!$buang && in_array($nama, ['href', 'src', 'action', 'formaction', 'xlink:href'], TRUE)) {
+                $buang = strpos($nilai, 'javascript:') === 0
+                    || strpos($nilai, 'vbscript:') === 0
+                    || (strpos($nilai, 'data:') === 0 && !($nama === 'src' && strpos($nilai, 'data:image/') === 0));
+            }
+            if ($buang) {
+                $attr->ownerElement->removeAttributeNode($attr);
+            }
+        }
+
+        $akar = $dom->getElementById('cbim-akar');
+        if (!$akar) {
+            return '';
+        }
+        $hasil = '';
+        foreach ($akar->childNodes as $anak) {
+            $hasil .= $dom->saveHTML($anak);
+        }
+        return $hasil;
+    }
+}
+
+if (!function_exists('data_situs_yayasan')) {
+    /**
+     * Data umum header/footer situs yayasan ($unit, $pengaturan).
+     *
+     * PERBAIKAN: Search, Pendaftaran, dan Newsletter memanggil
+     * templates/pages/header tanpa data ini sehingga muncul
+     * "Undefined variable $unit" dan logo di header/footer rusak. Header kini
+     * memakai fungsi ini sebagai cadangan. Nilainya sama dengan
+     * Page::_get_common_data().
+     */
+    function data_situs_yayasan()
+    {
+        $CI =& get_instance();
+        $kontak = $CI->db->get_where('konten', ['jenis_konten' => 'kontak'])->row_array();
+        $alamat = $CI->db->get_where('konten', ['jenis_konten' => 'alamat'])->row_array();
+
+        return [
+            'unit' => [
+                'logo'      => 'logo-cbim.png',
+                'nama'      => 'Yayasan Citra Bina Insan Mandiri',
+                'deskripsi' => 'Lembaga pendidikan terpadu di Nusa Tenggara Timur',
+                'telepon'   => !empty($kontak) ? strip_tags($kontak['isi_konten']) : '(0380) 8553888',
+                'email'     => 'info@cbim.or.id',
+                'alamat'    => !empty($alamat) ? strip_tags($alamat['isi_konten']) : 'Jl. Manafe No.17, Kel. Kayu Putih, Kec. Oebobo, Kota Kupang, NTT',
+            ],
+            'pengaturan' => [
+                'facebook'    => 'https://www.facebook.com/profile.php?id=100086189573438',
+                'instagram'   => 'https://www.instagram.com/yayasan_cbim/',
+                'youtube'     => 'https://www.youtube.com/@CBIMYayasan',
+                'teks_footer' => 'Maju Bersama Generasi Unggul Nusa Tenggara Timur',
+            ],
+        ];
     }
 }
 

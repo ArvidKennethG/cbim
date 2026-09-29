@@ -96,9 +96,9 @@ class Admin extends CI_Controller
             $where = "id_struktur=$id_struktur";
 
             if (!empty($_FILES['foto']['name'])) {
-                $foto_lama = htmlspecialchars($this->input->post('foto_lama'));
+                $foto_lama = htmlspecialchars(basename((string) $this->input->post('foto_lama'))); // PERBAIKAN: basename() cegah ../ (path traversal) pada unlink()
                 $old_photo_path = FCPATH . '/uploads/avatars/' . $foto_lama;
-                if (file_exists($old_photo_path)) {
+                if (is_file($old_photo_path)) {
                     unlink($old_photo_path);
                 }
 
@@ -122,7 +122,7 @@ class Admin extends CI_Controller
                     $this->session->set_flashdata('error', $upload_error);
                 }
             } else {
-                $foto_lama = htmlspecialchars($this->input->post('foto_lama'));
+                $foto_lama = htmlspecialchars(basename((string) $this->input->post('foto_lama'))); // PERBAIKAN: basename() -- konsisten dengan cabang unggah di atas
                 $data = array(
                     'foto' => $foto_lama,
                     'nama' => $nama_pejabat,
@@ -370,9 +370,9 @@ class Admin extends CI_Controller
 
             if (!empty($_FILES['gambar']['name'])) {
 
-                $gambar_lama = htmlspecialchars($this->input->post('gambar_lama'));
+                $gambar_lama = htmlspecialchars(basename((string) $this->input->post('gambar_lama'))); // PERBAIKAN: basename() cegah ../ (path traversal) pada unlink()
                 $old_photo_path = FCPATH . '/uploads/berita/' . $gambar_lama;
-                if (file_exists($old_photo_path)) {
+                if (is_file($old_photo_path)) {
                     unlink($old_photo_path);
                 }
 
@@ -399,7 +399,7 @@ class Admin extends CI_Controller
                 }
             } else {
 
-                $gambar_lama = htmlspecialchars($this->input->post('gambar_lama'));
+                $gambar_lama = htmlspecialchars(basename((string) $this->input->post('gambar_lama'))); // PERBAIKAN: basename() -- konsisten dengan cabang unggah di atas
                 $data = array(
                     'judul_berita' => $judul_berita,
                     'isi_berita' => $isi_berita,
@@ -478,9 +478,9 @@ class Admin extends CI_Controller
             $where = "id_foto=$id_foto";
 
             if (!empty($_FILES['foto']['name'])) {
-                $foto_lama = htmlspecialchars($this->input->post('foto_lama'));
+                $foto_lama = htmlspecialchars(basename((string) $this->input->post('foto_lama'))); // PERBAIKAN: basename() cegah ../ (path traversal) pada unlink()
                 $old_photo_path = FCPATH . '/uploads/galeri/' . $foto_lama;
-                if (file_exists($old_photo_path)) {
+                if (is_file($old_photo_path)) {
                     unlink($old_photo_path);
                 }
 
@@ -503,7 +503,7 @@ class Admin extends CI_Controller
                     $this->session->set_flashdata('error', $upload_error);
                 }
             } else {
-                $foto_lama = htmlspecialchars($this->input->post('foto_lama'));
+                $foto_lama = htmlspecialchars(basename((string) $this->input->post('foto_lama'))); // PERBAIKAN: basename() -- konsisten dengan cabang unggah di atas
                 $data = array(
                     'judul_foto' => $judul_foto,
                     'foto' => $foto_lama
@@ -629,6 +629,28 @@ class Admin extends CI_Controller
         exit();
     }
 
+    /**
+     * PERBAIKAN (hak akses PPDB): peta role admin unit -> jenjang, dipakai
+     * bersama oleh daftar, ekspor CSV, dan ubah status pendaftaran.
+     * Dulu hanya halaman daftar yang menyaring per jenjang; ekspor CSV
+     * mengeluarkan data SEMUA jenjang ke akun admin unit mana pun.
+     * Return null = boleh semua jenjang (administrator/default).
+     * Role lain di luar peta ditolak lewat check_rbac().
+     */
+    private function _jenjang_peran()
+    {
+        $role = $this->session->userdata('role');
+        if ($role === 'administrator' || $role === 'default') {
+            return null;
+        }
+        $peta = ['admin_tk' => 'TK', 'admin_sd' => 'SD', 'admin_smp' => 'SMP', 'admin_sma' => 'SMA', 'admin_ucb' => 'UCB'];
+        if (isset($peta[$role])) {
+            return $peta[$role];
+        }
+        $this->check_rbac([]); // redirect + exit
+        return null;
+    }
+
     // =========================================================================
     // ============= INT-03: PPDB Terpadu Management ===========================
     // =========================================================================
@@ -637,13 +659,9 @@ class Admin extends CI_Controller
         $jenjang = $this->input->get('jenjang', TRUE);
         $status = $this->input->get('status', TRUE);
 
-        $role = $this->session->userdata('role');
         // Auto filter for unit admins
-        if ($role === 'admin_tk') $jenjang = 'TK';
-        elseif ($role === 'admin_sd') $jenjang = 'SD';
-        elseif ($role === 'admin_smp') $jenjang = 'SMP';
-        elseif ($role === 'admin_sma') $jenjang = 'SMA';
-        elseif ($role === 'admin_ucb') $jenjang = 'UCB';
+        $jenjang_peran = $this->_jenjang_peran();
+        if ($jenjang_peran !== null) $jenjang = $jenjang_peran;
 
         if (!empty($jenjang)) {
             $this->db->where('jenjang', $jenjang);
@@ -673,7 +691,12 @@ class Admin extends CI_Controller
         if ($this->input->method() === 'post') {
             $id = (int)$this->input->post('id_pendaftaran');
             $status = htmlspecialchars($this->input->post('status'));
-            $this->db->where('id_pendaftaran', $id)->update('pendaftaran', ['status' => $status]);
+            $jenjang_peran = $this->_jenjang_peran();
+            $this->db->where('id_pendaftaran', $id);
+            if ($jenjang_peran !== null) {
+                $this->db->where('jenjang', $jenjang_peran); // admin unit: hanya jenjangnya sendiri
+            }
+            $this->db->update('pendaftaran', ['status' => $status]);
             $this->session->set_flashdata('success', 'Status pendaftaran berhasil diperbarui.');
             redirect('admin/pendaftaran_terpadu');
         }
@@ -695,7 +718,13 @@ class Admin extends CI_Controller
         $this->load->dbutil();
         $this->load->helper('download');
 
-        $query = $this->db->query("SELECT no_registrasi, jenjang, nama_lengkap, nik_nisn, jenis_kelamin, tempat_lahir, tgl_lahir, agama, nama_ortu, pekerjaan_ortu, no_hp, email, alamat, asal_sekolah, catatan, status, tanggal_daftar FROM pendaftaran ORDER BY id_pendaftaran DESC");
+        $jenjang_peran = $this->_jenjang_peran();
+        $this->db->select('no_registrasi, jenjang, nama_lengkap, nik_nisn, jenis_kelamin, tempat_lahir, tgl_lahir, agama, nama_ortu, pekerjaan_ortu, no_hp, email, alamat, asal_sekolah, catatan, status, tanggal_daftar')
+            ->from('pendaftaran');
+        if ($jenjang_peran !== null) {
+            $this->db->where('jenjang', $jenjang_peran); // admin unit: hanya jenjangnya sendiri
+        }
+        $query = $this->db->order_by('id_pendaftaran', 'DESC')->get();
         $delimiter = ",";
         $newline = "\r\n";
         $enclosure = '"';

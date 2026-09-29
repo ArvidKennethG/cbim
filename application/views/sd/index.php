@@ -40,7 +40,8 @@
         <div class="tk-grid-2" style="align-items: center">
             <div class="tk-kiri">
                 <div style="border-radius:24px; overflow:hidden; border:4px solid #fff; box-shadow:0 12px 24px rgba(59,51,85,.12); aspect-ratio:4/3">
-                     <img src="<?= base_url(); ?>assets/templates/media/avatars/150-2.jpg" alt="Kepala Sekolah SD" style="width:100%; height:100%; object-fit:cover">
+                     <?php /* PERBAIKAN: dulu avatar stok Metronic 150-2.jpg (file tidak ada). Sementara logo SD; ganti dengan foto kepala sekolah asli. */ ?>
+                     <img src="<?= base_url(); ?>assets/templates/media/logos/sd.png" alt="SD K Citra Bangsa Mandiri" style="width:100%; height:100%; object-fit:contain; background:#fff; padding:24px">
                 </div>
             </div>
             <div class="tk-kanan">
@@ -151,7 +152,7 @@
             <?php $delay=1; foreach ($data_berita as $berita): ?>
             <article class="tk-program tk-program--biru tk-muncul tk-tunda-<?= $delay ?>">
                 <div style="height:200px; margin:-32px -32px 24px; overflow:hidden; border-radius:32px 32px 0 0">
-                    <img src="<?= base_url(); ?>assets/templates/media/news/<?= !empty($berita['gambar']) ? htmlspecialchars($berita['gambar']) : '150-2.jpg'; ?>" alt="" style="width:100%; height:100%; object-fit:cover">
+                    <img src="<?= base_url(); ?><?= !empty($berita['gambar']) ? 'uploads/berita/' . htmlspecialchars($berita['gambar']) : 'assets/templates/media/logos/sd.png'; ?>" alt="" style="width:100%; height:100%; object-fit:cover">
                 </div>
                 <small style="color:var(--biru); font-weight:700; display:block; margin-bottom:8px"><?= date('d M Y', strtotime($berita['tanggal_post'])); ?></small>
                 <h3 style="font-size:1.4rem; line-height:1.3; margin-bottom:12px"><?= htmlspecialchars(strip_tags($berita['judul_berita'])); ?></h3>

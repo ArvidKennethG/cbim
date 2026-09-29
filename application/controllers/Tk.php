@@ -232,28 +232,21 @@ class Tk extends CI_Controller
         redirect('tk/ppdb');
     }
 
+    /**
+     * PERBAIKAN: view tk/fasilitas.php dan tk/kegiatan.php tidak pernah ada,
+     * sehingga /tk/fasilitas dan /tk/kegiatan dulu galat 500 ("Unable to load
+     * the requested file") -- padahal keduanya tercantum di sitemap.xml.
+     * Menu TK memakai "Program" dan "Galeri" untuk isi yang sama, jadi URL lama
+     * dialihkan permanen (301) ke sana.
+     */
     public function fasilitas()
     {
-        $data = $this->_base_data(
-            'Fasilitas Bermain & Belajar - TK K Citra Bangsa Mandiri',
-            'fasilitas',
-            'Sarana dan prasarana TK & PAUD Kristen Citra Bangsa Mandiri Kupang: ruang kelas ramah anak, area bermain, sentra belajar, dan lingkungan yang aman.'
-        );
-
-        $this->_render('fasilitas', $data);
+        redirect('tk/program', 'location', 301);
     }
 
     public function kegiatan()
     {
-        $data = $this->_base_data(
-            'Kegiatan & Ceria Anak - TK K Citra Bangsa Mandiri',
-            'kegiatan',
-            'Dokumentasi kegiatan bermain sambil belajar, pentas seni, dan keseharian anak di TK & PAUD Kristen Citra Bangsa Mandiri Kupang.'
-        );
-
-        $data['data_galeri'] = $this->m_data->get_data('galeri')->result_array();
-
-        $this->_render('kegiatan', $data);
+        redirect('tk/galeri', 'location', 301);
     }
 
     // =========================================================================

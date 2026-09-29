@@ -59,11 +59,14 @@ class M_data extends CI_Model
     }
 
     //fungsi untuk menghapus data
+    // PERBAIKAN: foto struktur diunggah Admin.php ke uploads/avatars/, tapi
+    // dulu yang dihapus justru assets/templates/media/avatars/ -- file lama
+    // menumpuk di uploads/. basename() mencegah ../ (path traversal).
     public function delete_data_wfoto($where, $table, $foto)
     {
         if ($this->db->delete($table, $where)) {
-            $old_photo_path = FCPATH . '/assets/templates/media/avatars/' . $foto;
-            if (file_exists($old_photo_path)) {
+            $old_photo_path = FCPATH . 'uploads/avatars/' . basename((string) $foto);
+            if (is_file($old_photo_path)) {
                 unlink($old_photo_path);
             }
             return $this->session->set_flashdata('success', 'Data berhasil dihapus.');
@@ -72,11 +75,12 @@ class M_data extends CI_Model
         }
     }
 
+    // PERBAIKAN: foto galeri ada di uploads/galeri/ (lihat Admin::add_foto).
     public function delete_data_gfoto($where, $table, $foto)
     {
         if ($this->db->delete($table, $where)) {
-            $old_photo_path = FCPATH . '/assets/templates/media/avatars/' . $foto;
-            if (file_exists($old_photo_path)) {
+            $old_photo_path = FCPATH . 'uploads/galeri/' . basename((string) $foto);
+            if (is_file($old_photo_path)) {
                 unlink($old_photo_path);
             }
             return $this->session->set_flashdata('success', 'Data berhasil dihapus.');

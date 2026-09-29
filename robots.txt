@@ -14,6 +14,8 @@ Allow: /sitemap.xml
 Disallow: /application/
 Disallow: /system/
 Disallow: /admin/
+Disallow: /admin-tk
+Disallow: /admin-sd
 Disallow: /auth/
 Disallow: /api/
 

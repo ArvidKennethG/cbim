@@ -50,7 +50,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 |		my-controller/my-method	-> my_controller/my_method
 */
 $route['default_controller'] = 'page';
-$route['404_override'] = '';
+// PERBAIKAN: view pages/empat_nol_empat.php (halaman 404 bergaya situs) sudah
+// ada sejak penggabungan 18 Sep 2026 tapi tidak pernah dipasang.
+$route['404_override'] = 'page/tidak_ditemukan';
 $route['translate_uri_dashes'] = FALSE;
 
 // ==========================================================================
@@ -89,6 +91,9 @@ $route['jejaring'] = 'page/jejaring';
 
 // Informasi
 $route['berita'] = 'page/berita';
+// PERBAIKAN: tautan berita memakai format berita/{id}/{slug} (2 segmen).
+// (:any) hanya cocok 1 segmen, sehingga dulu semua halaman detail -> 404.
+$route['berita/(:num)/(:any)'] = 'page/berita/$1/$2';
 $route['berita/(:any)'] = 'page/berita/$1';
 $route['kegiatan'] = 'page/kegiatan';
 $route['kegiatan/(:any)'] = 'page/kegiatan/$1';
@@ -109,6 +114,10 @@ $route['kontak/(:any)'] = 'kontak/$1';
 // Search Sitewide
 $route['search'] = 'search';
 $route['search/(:any)'] = 'search/$1';
+
+// Halaman pengarah pendaftaran (tautan "Pendaftaran" di footer situs yayasan).
+// PERBAIKAN: view pages/daftar.php sudah ada tapi rutenya belum -> dulu 404.
+$route['daftar'] = 'page/daftar';
 
 // Portal Pendaftaran Terpadu Multi-Step
 $route['pendaftaran'] = 'pendaftaran';

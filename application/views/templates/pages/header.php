@@ -1,6 +1,19 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+// PERBAIKAN: controller Search, Pendaftaran, dan Newsletter memuat header ini
+// tanpa $unit/$pengaturan/$judul_hal. Isi dengan data bawaan situs, lalu
+// bagikan ke view berikutnya (footer) lewat load->vars().
+if (!isset($unit) || !isset($pengaturan)) {
+    $situs = data_situs_yayasan();
+    $unit = isset($unit) ? $unit : $situs['unit'];
+    $pengaturan = isset($pengaturan) ? $pengaturan : $situs['pengaturan'];
+}
+$judul_hal = isset($judul_hal) ? $judul_hal : $unit['nama'];
+$deskripsi = isset($deskripsi) ? $deskripsi : $unit['deskripsi'];
+$halaman   = isset($halaman) ? $halaman : '';
+get_instance()->load->vars(compact('unit', 'pengaturan', 'judul_hal', 'deskripsi', 'halaman'));
+
 $logo = base_url('assets/img/' . $unit['logo']);
 $home = base_url();
 

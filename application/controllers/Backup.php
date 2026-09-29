@@ -74,7 +74,14 @@ class Backup extends CI_Controller
         // http://localhost/cbim_backups/ -- itu justru mengulang celah yang
         // sedang kita tutup.
         // ---------------------------------------------------------------------
-        $explicit = 'C:/xampp/cbim_backups/';
+        // PERBAIKAN: path Windows ini dulu dipakai di semua OS. Di Linux,
+        // 'C:/xampp/cbim_backups/' adalah path RELATIF, sehingga mkdir()
+        // membuat folder bernama "C:" DI DALAM web root dan backup database
+        // tersimpan di <web root>/C:/xampp/cbim_backups/ (tanpa .htaccess
+        // penjaga) -- kebalikan dari tujuan fungsi ini. Kini hanya dipakai di
+        // Windows; di Linux jatuh ke deteksi otomatis (satu tingkat di atas
+        // web root) di bawah.
+        $explicit = (DIRECTORY_SEPARATOR === '\\') ? 'C:/xampp/cbim_backups/' : '';
 
         if (!empty($explicit)) {
             $explicit = rtrim(str_replace('\\', '/', $explicit), '/') . '/';

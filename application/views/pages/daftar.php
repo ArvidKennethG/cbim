@@ -56,7 +56,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <div class="baris baris--3">
             <?php foreach ($pendidikan as $j): ?>
                 <a class="unit-kartu masuk"
-                   href="<?= $j['internal'] ? base_url($j['slug_unit'] . '/daftar') : html_escape($j['tautan']); ?>"
+                   href="<?= $j['internal'] ? base_url($j['slug_unit'] . '/ppdb') : html_escape($j['tautan']); ?>"
                    <?= $j['internal'] ? '' : 'target="_blank" rel="noopener"'; ?>>
                     <span class="unit-kartu__tingkat"><?= html_escape($j['jenjang']); ?></span>
                     <h3 style="font-size:1.1rem"><?= html_escape($j['nama']); ?></h3>
