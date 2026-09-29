@@ -1,0 +1,48 @@
+# =============================================================================
+# CBIM - PROTEKSI DIREKTORI UPLOADS
+# =============================================================================
+# Folder ini menampung file yang diunggah lewat panel admin (gambar berita,
+# foto galeri, dsb). File yang diunggah TIDAK BOLEH bisa dieksekusi sebagai
+# script - kalau ada celah upload, penyerang bisa menanam webshell .php.
+#
+# Aturan di bawah tetap mengizinkan gambar/dokumen diakses seperti biasa.
+# =============================================================================
+
+# Matikan directory listing
+Options -Indexes
+
+# Larang eksekusi script apa pun di dalam folder uploads
+<FilesMatch "\.(php|php3|php4|php5|php7|php8|phtml|phar|pl|py|cgi|sh|asp|aspx|jsp)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Jangan pernah menjalankan PHP handler di sini
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
+
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8
+RemoveType .php .phtml .php3 .php4 .php5 .php7 .php8
+
+# Larang akses ke dump database bila ada yang tertinggal di sini
+<FilesMatch "\.(sql|sql\.gz|gz|zip|tar|bak|env|log)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>

@@ -1,0 +1,20 @@
+# Robots.txt for Yayasan Citra Bina Insan Mandiri (CBIM)
+User-agent: *
+Allow: /
+Allow: /assets/
+Allow: /uploads/
+Allow: /sd
+Allow: /tk
+Allow: /page/
+Allow: /pendaftaran
+Allow: /kebijakan-privasi
+Allow: /sitemap.xml
+
+# Disallow sensitive / system directories
+Disallow: /application/
+Disallow: /system/
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /api/
+
+Sitemap: https://cbim.or.id/sitemap.xml
