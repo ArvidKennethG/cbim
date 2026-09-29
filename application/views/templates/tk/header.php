@@ -778,9 +778,6 @@
             <a href="<?= base_url('tk'); ?>" <?= (isset($active_menu) && $active_menu == 'home') ? 'aria-current="page"' : ''; ?>>Beranda</a>
             <a href="<?= base_url('tk/profil'); ?>" <?= (isset($active_menu) && $active_menu == 'profil') ? 'aria-current="page"' : ''; ?>>Profil</a>
             <a href="<?= base_url('tk/program'); ?>" <?= (isset($active_menu) && $active_menu == 'program') ? 'aria-current="page"' : ''; ?>>Program</a>
-            <a href="<?= base_url('tk/berita'); ?>" <?= (isset($active_menu) && $active_menu == 'berita') ? 'aria-current="page"' : ''; ?>>Berita</a>
-            <a href="<?= base_url('tk/video_kegiatan'); ?>" <?= (isset($active_menu) && $active_menu == 'video') ? 'aria-current="page"' : ''; ?>>Video</a>
-            <a href="<?= base_url('tk/galeri'); ?>" <?= (isset($active_menu) && $active_menu == 'galeri') ? 'aria-current="page"' : ''; ?>>Galeri</a>
             <a href="<?= base_url('tk/ppdb'); ?>" <?= (isset($active_menu) && $active_menu == 'ppdb') ? 'aria-current="page"' : ''; ?>>Pendaftaran</a>
         </nav>
 

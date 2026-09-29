@@ -779,9 +779,6 @@
             <a href="<?= base_url('sd/profil'); ?>" <?= (isset($active_menu) && $active_menu == 'profil') ? 'aria-current="page"' : ''; ?>>Profil</a>
             <a href="<?= base_url('sd/fasilitas'); ?>" <?= (isset($active_menu) && $active_menu == 'fasilitas') ? 'aria-current="page"' : ''; ?>>Fasilitas</a>
             <a href="<?= base_url('sd/kegiatan'); ?>" <?= (isset($active_menu) && $active_menu == 'kegiatan') ? 'aria-current="page"' : ''; ?>>Kegiatan</a>
-            <a href="<?= base_url('sd/berita'); ?>" <?= (isset($active_menu) && $active_menu == 'berita') ? 'aria-current="page"' : ''; ?>>Berita</a>
-            <a href="<?= base_url('sd/video_kegiatan'); ?>" <?= (isset($active_menu) && $active_menu == 'video') ? 'aria-current="page"' : ''; ?>>Video</a>
-            <a href="<?= base_url('sd/galeri'); ?>" <?= (isset($active_menu) && $active_menu == 'galeri') ? 'aria-current="page"' : ''; ?>>Galeri</a>
             <a href="<?= base_url('sd/ppdb'); ?>" <?= (isset($active_menu) && $active_menu == 'ppdb') ? 'aria-current="page"' : ''; ?>>Pendaftaran</a>
         </nav>
 
